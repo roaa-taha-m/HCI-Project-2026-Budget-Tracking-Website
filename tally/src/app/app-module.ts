@@ -13,6 +13,12 @@ import { Income } from './pages/income/income';
 import { Goals } from './pages/goals/goals';
 import { Reports } from './pages/reports/reports';
 
+import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
+import { provideFirestore, getFirestore } from '@angular/fire/firestore';
+import { provideAuth, getAuth } from '@angular/fire/auth';
+import { provideHttpClient } from '@angular/common/http';
+import { environment } from '../environments/environment';  
+
 @NgModule({
   declarations: [
     App,
@@ -34,6 +40,10 @@ import { Reports } from './pages/reports/reports';
   ],
   providers: [
     provideBrowserGlobalErrorListeners(),
+    provideHttpClient(),
+    provideFirebaseApp(() => initializeApp(environment.firebase)),
+    provideFirestore(() => getFirestore()),
+    provideAuth(() => getAuth()),
   ],
   bootstrap: [App],
 })
