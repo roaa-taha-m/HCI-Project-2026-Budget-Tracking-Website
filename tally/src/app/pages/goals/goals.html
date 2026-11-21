@@ -1,0 +1,65 @@
+<div class="page">
+  <header>
+    <h1>Goals</h1>
+    <p class="page-sub">Save for what matters and track how close you are.</p>
+  </header>
+
+  <div class="row">
+    <section class="grow-3 stack" aria-label="Your goals">
+      @for (g of goals; track g.id) {
+        <article class="card goal">
+          <div class="ring" [style.background]="ring(g)" role="img" [attr.aria-label]="percent(g) + ' percent complete'">
+            <span>{{ percent(g) }}%</span>
+          </div>
+          <div class="goal-info">
+            <div class="between">
+              <h3>{{ g.name }}</h3>
+              @if (g.saved >= g.target) {
+                <span class="badge ok">Completed</span>
+              }
+            </div>
+            <span>{{ g.saved | currency: 'USD' : 'symbol' : '1.0-0' }} saved of {{ g.target | currency: 'USD' : 'symbol' : '1.0-0' }} · Target {{ g.deadline | date: 'MMM y' }}</span>
+            <div class="actions">
+              <button type="button" class="link-btn" (click)="addFunds(g)">Add $100</button>
+              <button type="button" class="link-btn danger" (click)="remove(g)">Delete</button>
+            </div>
+          </div>
+        </article>
+      } @empty {
+        <div class="card center">No goals yet. Create your first one.</div>
+      }
+    </section>
+
+    <section class="card grow-2" aria-label="New goal">
+      <h2>New goal</h2>
+      <form class="form" [formGroup]="form" (ngSubmit)="add()" novalidate>
+        <div class="field">
+          <label for="name">Goal name</label>
+          <input id="name" class="input" type="text" formControlName="name" placeholder="e.g. New laptop" [class.invalid]="invalid('name')" />
+          @if (invalid('name')) {
+            <span class="error">Give your goal a name.</span>
+          }
+        </div>
+        <div class="field">
+          <label for="target">Target amount</label>
+          <input id="target" class="input" type="number" formControlName="target" placeholder="$ 0.00" [class.invalid]="invalid('target')" />
+          @if (invalid('target')) {
+            <span class="error">Enter a target greater than 0.</span>
+          }
+        </div>
+        <div class="field">
+          <label for="saved">Already saved</label>
+          <input id="saved" class="input" type="number" formControlName="saved" placeholder="$ 0.00" />
+        </div>
+        <div class="field">
+          <label for="deadline">Target date</label>
+          <input id="deadline" class="input" type="date" formControlName="deadline" [class.invalid]="invalid('deadline')" />
+          @if (invalid('deadline')) {
+            <span class="error">Pick a target date.</span>
+          }
+        </div>
+        <button class="btn" type="submit">Save goal</button>
+      </form>
+    </section>
+  </div>
+</div>

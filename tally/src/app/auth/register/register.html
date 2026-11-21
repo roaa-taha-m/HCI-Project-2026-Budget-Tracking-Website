@@ -1,0 +1,63 @@
+<div class="auth">
+  <div class="auth-form">
+    <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <div class="brand"><span class="logo">T</span> Tally</div>
+      <div>
+        <h1>Create your account</h1>
+        <p class="page-sub">It takes a minute. You can add your first budget right after.</p>
+      </div>
+
+      <div class="field">
+        <label for="name">Full name</label>
+        <input id="name" class="input" type="text" formControlName="name" placeholder="Alex Morgan"
+          [class.invalid]="invalid('name')" />
+        @if (invalid('name')) {
+          <span class="error">Your name is required.</span>
+        }
+      </div>
+
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" class="input" type="email" formControlName="email" placeholder="you@example.com"
+          [class.invalid]="invalid('email')" />
+        @if (invalid('email')) {
+          <span class="error">Enter a valid email address.</span>
+        }
+      </div>
+
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" class="input" type="password" formControlName="password" placeholder="At least 8 characters"
+          [class.invalid]="invalid('password')" />
+        @if (invalid('password')) {
+          <span class="error">Password must be at least 8 characters.</span>
+        } @else {
+          <span class="hint">Use 8 or more characters.</span>
+        }
+      </div>
+
+      <div class="field">
+        <label for="confirm">Confirm password</label>
+        <input id="confirm" class="input" type="password" formControlName="confirm" placeholder="Re-enter your password"
+          [class.invalid]="invalid('confirm') || mismatch" />
+        @if (mismatch) {
+          <span class="error">Passwords do not match.</span>
+        }
+      </div>
+
+      <button class="btn" type="submit">Create account</button>
+      <p class="page-sub center">Already have an account? <a routerLink="/login"><strong>Sign in</strong></a></p>
+    </form>
+  </div>
+
+  <div class="auth-panel">
+    <div>
+      <h2>Three steps to a calmer month.</h2>
+      <ul>
+        <li>Add your income</li>
+        <li>Set category limits</li>
+        <li>Log expenses as you go</li>
+      </ul>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,73 @@
+<div class="page">
+  <header class="page-head">
+    <div>
+      <h1>Good morning, Alex</h1>
+      <p class="page-sub">Here is your money overview for November 2026.</p>
+    </div>
+    <a class="btn" routerLink="/expenses">+ Add expense</a>
+  </header>
+
+  <section class="row">
+    <div class="card stat"><span>Total balance</span><span class="value">{{ summary.balance | currency }}</span></div>
+    <div class="card stat"><span>Income</span><span class="value income">{{ summary.income | currency }}</span></div>
+    <div class="card stat"><span>Expenses</span><span class="value expense">{{ summary.expenses | currency }}</span></div>
+    <div class="card stat"><span>Savings this month</span><span class="value">{{ summary.savings | currency }}</span></div>
+  </section>
+
+  <section class="row">
+    <div class="card grow-3">
+      <div class="between">
+        <h2>Income vs expenses</h2>
+        <div class="legend">
+          <span><i style="background: var(--primary)"></i>Income</span>
+          <span><i style="background: #E58A57"></i>Expenses</span>
+        </div>
+      </div>
+      <div class="bars">
+        @for (m of months; track m.name) {
+          <div class="bar-group">
+            <div class="bar-pair">
+              <div class="bar inc" [style.height.px]="barHeight(m.income)" [title]="m.income | currency"></div>
+              <div class="bar exp" [style.height.px]="barHeight(m.expenses)" [title]="m.expenses | currency"></div>
+            </div>
+            <span class="bar-label">{{ m.name }}</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="card grow-2 stack">
+      <h2>Spending by category</h2>
+      @for (c of categories; track c.name) {
+        <div>
+          <div class="between"><strong>{{ c.name }}</strong><span>{{ c.amount | currency }} · {{ categoryPercent(c.amount) }}%</span></div>
+          <div class="progress soft"><div [style.width.%]="categoryPercent(c.amount)"></div></div>
+        </div>
+      }
+    </div>
+  </section>
+
+  <section class="row">
+    <div class="card grow-2 stack">
+      <div class="between"><h2>Savings goals</h2><a routerLink="/goals">View all</a></div>
+      @for (g of goals; track g.name) {
+        <div>
+          <div class="between"><strong>{{ g.name }}</strong><span>{{ g.saved | currency }} of {{ g.target | currency }}</span></div>
+          <div class="progress soft"><div [style.width.%]="goalPercent(g)"></div></div>
+        </div>
+      }
+    </div>
+
+    <div class="card grow-3">
+      <div class="between"><h2>Recent transactions</h2><a routerLink="/expenses">See all</a></div>
+      <ul class="list">
+        @for (t of transactions; track t.title) {
+          <li>
+            <div><strong>{{ t.title }}</strong><br /><small>{{ t.category }} · {{ t.date | date: 'MMM d' }}</small></div>
+            <strong [class.income]="t.amount > 0" [class.expense]="t.amount < 0">{{ t.amount | currency }}</strong>
+          </li>
+        }
+      </ul>
+    </div>
+  </section>
+</div>

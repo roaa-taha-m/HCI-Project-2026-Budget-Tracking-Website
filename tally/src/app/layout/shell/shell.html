@@ -1,0 +1,26 @@
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand"><span class="logo">T</span> Tally</div>
+
+    <nav class="side-nav" aria-label="Main">
+      <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+      <a routerLink="/budgets" routerLinkActive="active">Budgets</a>
+      <a routerLink="/expenses" routerLinkActive="active">Expenses</a>
+      <a routerLink="/income" routerLinkActive="active">Income</a>
+      <a routerLink="/goals" routerLinkActive="active">Goals</a>
+      <a routerLink="/reports" routerLinkActive="active">Reports</a>
+    </nav>
+
+    <div class="user">
+      <span class="avatar">BS</span>
+      <div>
+        <strong>Bahgat Saber</strong><br />
+        <a routerLink="/login">Log out</a>
+      </div>
+    </div>
+  </aside>
+
+  <main class="content">
+    <router-outlet />
+  </main>
+</div>

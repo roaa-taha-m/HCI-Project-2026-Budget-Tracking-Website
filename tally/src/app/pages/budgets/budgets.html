@@ -1,0 +1,67 @@
+<div class="page">
+  <header class="page-head">
+    <div>
+      <h1>Budgets</h1>
+      <p class="page-sub">Set a limit for each category and watch it fill up.</p>
+    </div>
+    <strong>November 2026</strong>
+  </header>
+
+  <section class="card row" aria-label="Budget summary">
+    <div class="stack grow-2"><span class="page-sub">Total budget</span><span class="value">{{ totalLimit | currency: 'USD' : 'symbol' : '1.0-0' }}</span></div>
+    <div class="stack grow-2"><span class="page-sub">Spent so far</span><span class="value expense">{{ totalSpent | currency: 'USD' : 'symbol' : '1.0-0' }}</span></div>
+    <div class="stack grow-2"><span class="page-sub">Remaining</span><span class="value income">{{ remaining | currency: 'USD' : 'symbol' : '1.0-0' }}</span></div>
+    <div class="stack grow-3">
+      <span class="page-sub">{{ usedPercent }}% of budget used</span>
+      <div class="progress soft"><div [style.width.%]="usedPercent"></div></div>
+    </div>
+  </section>
+
+  <div class="row">
+    <section class="grow-3 stack" aria-label="Category budgets">
+      @for (b of budgets; track b.category) {
+        <article class="card stack">
+          <div class="between">
+            <h3>{{ b.category }}</h3>
+            <span class="badge" [ngClass]="status(b)">{{ statusLabel(b) }}</span>
+          </div>
+          <div class="progress"><div [ngClass]="status(b)" [style.width.%]="percent(b)"></div></div>
+          <div class="between">
+            <span>{{ b.spent | currency: 'USD' : 'symbol' : '1.0-0' }} of {{ b.limit | currency: 'USD' : 'symbol' : '1.0-0' }}</span>
+            @if (b.spent > b.limit) {
+              <strong class="expense">{{ b.spent - b.limit | currency: 'USD' : 'symbol' : '1.0-0' }} over</strong>
+            } @else {
+              <span>{{ b.limit - b.spent | currency: 'USD' : 'symbol' : '1.0-0' }} left</span>
+            }
+          </div>
+          <div class="actions">
+            <button type="button" class="link-btn danger" (click)="remove(b)">Delete</button>
+          </div>
+        </article>
+      }
+    </section>
+
+    <section class="card grow-2" aria-label="New budget">
+      <h2>New budget</h2>
+      <form class="form" [formGroup]="form" (ngSubmit)="add()" novalidate>
+        <div class="field">
+          <label for="category">Category</label>
+          <select id="category" class="input" formControlName="category">
+            @for (c of categoryOptions; track c) {
+              <option [value]="c">{{ c }}</option>
+            }
+          </select>
+        </div>
+        <div class="field">
+          <label for="limit">Monthly limit</label>
+          <input id="limit" class="input" type="number" formControlName="limit" placeholder="$ 0.00" [class.invalid]="invalid('limit')" />
+          @if (invalid('limit')) {
+            <span class="error">Enter a limit greater than 0.</span>
+          }
+        </div>
+        <label class="check"><input type="checkbox" formControlName="repeat" /> Repeat every month</label>
+        <button class="btn" type="submit">Save budget</button>
+      </form>
+    </section>
+  </div>
+</div>

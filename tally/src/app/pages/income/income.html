@@ -1,0 +1,90 @@
+<div class="page">
+  <header class="page-head">
+    <div>
+      <h1>Income</h1>
+      <p class="page-sub">Every source of money coming in.</p>
+    </div>
+    <div class="stack" style="gap: 2px; text-align: right">
+      <span class="page-sub">Total this month</span>
+      <span class="value income">{{ total | currency }}</span>
+    </div>
+  </header>
+
+  <section class="row" aria-label="Income sources">
+    @for (s of bySource; track s.source) {
+      <div class="card stat">
+        <span>{{ s.source }}</span>
+        <span class="value">{{ s.total | currency: 'USD' : 'symbol' : '1.0-0' }}</span>
+        <small>{{ s.percent }}% of income</small>
+      </div>
+    }
+  </section>
+
+  <div class="row">
+    <section class="card grow-5" aria-label="Income history">
+      <h2>Income history</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Source</th>
+              <th scope="col">Frequency</th>
+              <th scope="col">Date</th>
+              <th scope="col" class="right">Amount</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (e of entries; track e.id) {
+              <tr>
+                <td><strong>{{ e.source }}</strong></td>
+                <td>{{ e.frequency }}</td>
+                <td>{{ e.date | date: 'MMM d' }}</td>
+                <td class="right income"><strong>{{ e.amount | currency }}</strong></td>
+                <td><button type="button" class="link-btn danger" (click)="remove(e)">Delete</button></td>
+              </tr>
+            } @empty {
+              <tr><td colspan="5" class="center">No income added yet.</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card grow-2" aria-label="Add income">
+      <h2>Add income</h2>
+      <form class="form" [formGroup]="form" (ngSubmit)="add()" novalidate>
+        <div class="field">
+          <label for="source">Source</label>
+          <input id="source" class="input" type="text" formControlName="source" placeholder="e.g. Salary" [class.invalid]="invalid('source')" />
+          @if (invalid('source')) {
+            <span class="error">Source is required.</span>
+          }
+        </div>
+        <div class="field">
+          <label for="amount">Amount</label>
+          <input id="amount" class="input" type="number" formControlName="amount" placeholder="$ 0.00" [class.invalid]="invalid('amount')" />
+          @if (invalid('amount')) {
+            <span class="error">Enter an amount greater than 0.</span>
+          }
+        </div>
+        <div class="field">
+          <label for="frequency">Frequency</label>
+          <select id="frequency" class="input" formControlName="frequency">
+            @for (f of frequencies; track f) {
+              <option [value]="f">{{ f }}</option>
+            }
+          </select>
+        </div>
+        <div class="field">
+          <label for="date">Date</label>
+          <input id="date" class="input" type="date" formControlName="date" [class.invalid]="invalid('date')" />
+          @if (invalid('date')) {
+            <span class="error">Pick a date.</span>
+          }
+        </div>
+        <button class="btn" type="submit">Save income</button>
+      </form>
+    </section>
+  </div>
+</div>

@@ -1,0 +1,103 @@
+<div class="page">
+  <header class="page-head">
+    <div>
+      <h1>Expenses</h1>
+      <p class="page-sub">Add, edit and review everything you spent.</p>
+    </div>
+    <div class="stack" style="gap: 2px; text-align: right">
+      <span class="page-sub">Total this month</span>
+      <span class="value expense">{{ total | currency }}</span>
+    </div>
+  </header>
+
+  <div class="row">
+    <section class="card grow-2" aria-label="Add expense">
+      <h2>Add expense</h2>
+      <form class="form" [formGroup]="form" (ngSubmit)="add()" novalidate>
+        <div class="field">
+          <label for="description">Description</label>
+          <input id="description" class="input" type="text" formControlName="description" placeholder="e.g. Grocery market"
+            [class.invalid]="invalid('description')" />
+          @if (invalid('description')) {
+            <span class="error">Description is required.</span>
+          }
+        </div>
+        <div class="field">
+          <label for="amount">Amount</label>
+          <input id="amount" class="input" type="number" formControlName="amount" placeholder="$ 0.00" [class.invalid]="invalid('amount')" />
+          @if (invalid('amount')) {
+            <span class="error">Enter an amount greater than 0.</span>
+          }
+        </div>
+        <div class="field">
+          <label for="category">Category</label>
+          <select id="category" class="input" formControlName="category">
+            @for (c of categories; track c) {
+              <option [value]="c">{{ c }}</option>
+            }
+          </select>
+        </div>
+        <div class="field">
+          <label for="date">Date</label>
+          <input id="date" class="input" type="date" formControlName="date" [class.invalid]="invalid('date')" />
+          @if (invalid('date')) {
+            <span class="error">Pick a date.</span>
+          }
+        </div>
+        <label class="check"><input type="checkbox" formControlName="recurring" /> This is a recurring expense</label>
+        <button class="btn" type="submit">Save expense</button>
+      </form>
+    </section>
+
+    <section class="card grow-5" aria-label="Expense list">
+      <div class="row">
+        <div class="field grow-2">
+          <label for="search">Search</label>
+          <input id="search" class="input small" type="search" [formControl]="search" placeholder="Search expenses" />
+        </div>
+        <div class="field" style="flex: 1 1 150px">
+          <label for="filter">Category</label>
+          <select id="filter" class="input small" [formControl]="filter">
+            <option value="All">All categories</option>
+            @for (c of categories; track c) {
+              <option [value]="c">{{ c }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Description</th>
+              <th scope="col">Category</th>
+              <th scope="col">Date</th>
+              <th scope="col" class="right">Amount</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (e of filtered; track e.id) {
+              <tr>
+                <td>
+                  <strong>{{ e.description }}</strong>
+                  @if (e.recurring) {
+                    <span class="badge recurring">Recurring</span>
+                  }
+                </td>
+                <td>{{ e.category }}</td>
+                <td>{{ e.date | date: 'MMM d' }}</td>
+                <td class="right expense"><strong>{{ e.amount | currency }}</strong></td>
+                <td><button type="button" class="link-btn danger" (click)="remove(e)">Delete</button></td>
+              </tr>
+            } @empty {
+              <tr><td colspan="5" class="center">No expenses match your search.</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <p class="hint">Showing {{ filtered.length }} of {{ expenses.length }} expenses</p>
+    </section>
+  </div>
+</div>

@@ -1,0 +1,114 @@
+<div class="page">
+  <header class="page-head">
+    <div>
+      <h1>Reports</h1>
+      <p class="page-sub">Generate financial reports for any period.</p>
+    </div>
+    <button type="button" class="btn no-print" (click)="print()">Export report</button>
+  </header>
+
+  <section class="card row no-print" aria-label="Report filters" style="align-items: flex-end">
+    <div class="field grow-2">
+      <label for="type">Report type</label>
+      <select id="type" class="input small" [formControl]="reportType">
+        <option value="income-expenses">Income vs expenses</option>
+        <option value="budget-variance">Budget variance</option>
+        <option value="savings">Savings progress</option>
+      </select>
+    </div>
+    <div class="field" style="flex: 1 1 150px">
+      <label for="from">From</label>
+      <input id="from" class="input small" type="date" [formControl]="from" />
+    </div>
+    <div class="field" style="flex: 1 1 150px">
+      <label for="to">To</label>
+      <input id="to" class="input small" type="date" [formControl]="to" />
+    </div>
+  </section>
+
+  @switch (reportType.value) {
+    @case ('income-expenses') {
+      <section class="card">
+        <div class="between">
+          <h2>Income vs expenses</h2>
+          <div class="legend">
+            <span><i style="background: var(--primary)"></i>Income</span>
+            <span><i style="background: #E58A57"></i>Expenses</span>
+          </div>
+        </div>
+        <div class="bars">
+          @for (m of months; track m.name) {
+            <div class="bar-group">
+              <div class="bar-pair">
+                <div class="bar inc" [style.height.px]="barHeight(m.income)" [title]="m.income | currency"></div>
+                <div class="bar exp" [style.height.px]="barHeight(m.expenses)" [title]="m.expenses | currency"></div>
+              </div>
+              <span class="bar-label">{{ m.name }}</span>
+            </div>
+          }
+        </div>
+      </section>
+    }
+
+    @case ('budget-variance') {
+      <section class="card">
+        <h2>Budget variance · November 2026</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Category</th>
+                <th scope="col" class="right">Budgeted</th>
+                <th scope="col" class="right">Actual</th>
+                <th scope="col" class="right">Variance</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (v of variance; track v.category) {
+                <tr>
+                  <td><strong>{{ v.category }}</strong></td>
+                  <td class="right">{{ v.budgeted | currency: 'USD' : 'symbol' : '1.0-0' }}</td>
+                  <td class="right">{{ v.actual | currency: 'USD' : 'symbol' : '1.0-0' }}</td>
+                  <td class="right">
+                    @if (v.actual > v.budgeted) {
+                      <strong class="expense">{{ v.actual - v.budgeted | currency: 'USD' : 'symbol' : '1.0-0' }} over</strong>
+                    } @else {
+                      <strong class="income">{{ v.budgeted - v.actual | currency: 'USD' : 'symbol' : '1.0-0' }} under</strong>
+                    }
+                  </td>
+                </tr>
+              }
+              <tr>
+                <td><strong>Total</strong></td>
+                <td class="right"><strong>{{ totalBudgeted | currency: 'USD' : 'symbol' : '1.0-0' }}</strong></td>
+                <td class="right"><strong>{{ totalActual | currency: 'USD' : 'symbol' : '1.0-0' }}</strong></td>
+                <td class="right">
+                  <strong class="income">{{ totalBudgeted - totalActual | currency: 'USD' : 'symbol' : '1.0-0' }} under</strong>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    }
+
+    @case ('savings') {
+      <section class="card">
+        <div class="between">
+          <h2>Savings progress</h2>
+          <strong class="income">{{ totalSavings | currency: 'USD' : 'symbol' : '1.0-0' }} saved in 6 months</strong>
+        </div>
+        <div class="bars">
+          @for (s of savings; track s.name) {
+            <div class="bar-group">
+              <div class="bar-pair">
+                <div class="bar sav" [style.height.px]="barHeight(s.amount, 1500)" [title]="s.amount | currency"></div>
+              </div>
+              <span class="bar-label">{{ s.name }}</span>
+            </div>
+          }
+        </div>
+      </section>
+    }
+  }
+</div>
