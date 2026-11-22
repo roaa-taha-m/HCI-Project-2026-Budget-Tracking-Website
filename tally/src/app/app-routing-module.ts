@@ -9,6 +9,7 @@ import { Expenses } from './pages/expenses/expenses';
 import { Income } from './pages/income/income';
 import { Goals } from './pages/goals/goals';
 import { Reports } from './pages/reports/reports';
+import { authGuard } from './core/guards/auth.guard';
 
 const routes: Routes = [
   { path: 'login', component: Login },
@@ -17,6 +18,7 @@ const routes: Routes = [
     // Role 2: add canActivate guards on this route later
     path: '',
     component: Shell,
+    canActivate: [authGuard],
     children: [
       { path: 'dashboard', component: Dashboard },
       { path: 'budgets', component: Budgets },

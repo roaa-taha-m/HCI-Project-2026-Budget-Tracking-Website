@@ -40,7 +40,9 @@
         <label for="confirm">Confirm password</label>
         <input id="confirm" class="input" type="password" formControlName="confirm" placeholder="Re-enter your password"
           [class.invalid]="invalid('confirm') || mismatch" />
-        @if (mismatch) {
+        @if (invalid('confirm')) {
+          <span class="error">Please confirm your password.</span>
+        } @else if (mismatch) {
           <span class="error">Passwords do not match.</span>
         }
       </div>

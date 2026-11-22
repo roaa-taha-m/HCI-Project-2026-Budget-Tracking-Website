@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { AuthService } from '../../core/services/auth.service';
 
 function passwordsMatch(group: AbstractControl) {
   return group.get('password')?.value === group.get('confirm')?.value ? null : { mismatch: true };
@@ -14,7 +15,7 @@ function passwordsMatch(group: AbstractControl) {
 export class Register {
   form: FormGroup;
 
-  constructor(private fb: FormBuilder, private router: Router) {
+  constructor(private fb: FormBuilder, private router: Router, private authService: AuthService) {
     this.form = this.fb.group(
       {
         name: ['', Validators.required],
@@ -36,11 +37,19 @@ export class Register {
   }
 
   submit() {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      return;
-    }
-    // TODO (Role 2): call the auth service to create the account.
-    this.router.navigate(['/dashboard']);
+  if (this.form.invalid) {
+    this.form.markAllAsTouched();
+    return;
+  }
+
+  const { name, email, password } = this.form.value;
+
+  this.authService.register(name, email, password)
+    .then(() => {
+      this.router.navigate(['/dashboard']);
+    })
+    .catch((error) => {
+      console.error('Registration error:', error);
+    });
   }
 }

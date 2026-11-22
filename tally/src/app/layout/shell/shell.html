@@ -11,11 +11,13 @@
       <a routerLink="/reports" routerLinkActive="active">Reports</a>
     </nav>
 
-    <div class="user">
-      <span class="avatar">BS</span>
+    <div class="user" *ngIf="user$ | async as user">
+        <span class="avatar">
+          {{ user.displayName?.charAt(0) || 'U' }}
+        </span>
       <div>
-        <strong>Bahgat Saber</strong><br />
-        <a routerLink="/login">Log out</a>
+        <strong>{{ user.displayName || user.email }}</strong><br />
+        <a href="#" (click)="logout(); $event.preventDefault()">Log out</a>
       </div>
     </div>
   </aside>
