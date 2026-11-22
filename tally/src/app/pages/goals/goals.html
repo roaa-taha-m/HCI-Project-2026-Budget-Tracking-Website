@@ -18,9 +18,10 @@
                 <span class="badge ok">Completed</span>
               }
             </div>
-            <span>{{ g.saved | currency: 'USD' : 'symbol' : '1.0-0' }} saved of {{ g.target | currency: 'USD' : 'symbol' : '1.0-0' }} · Target {{ g.deadline | date: 'MMM y' }}</span>
-            <div class="actions">
+            <span>{{ g.saved | currency: 'USD' : 'symbol' : '1.0-0' }} saved of {{ g.target | currency: 'USD' : 'symbol' : '1.0-0' }} · Target {{ g.deadline | date: 'MMM y' }} · {{ g.deadline | daysLeft }}</span>
+            <div class="actions" style="display: flex; gap: 12px">
               <button type="button" class="link-btn" (click)="addFunds(g)">Add $100</button>
+              <button type="button" class="link-btn" (click)="edit(g)">Edit</button>
               <button type="button" class="link-btn danger" (click)="remove(g)">Delete</button>
             </div>
           </div>
@@ -31,7 +32,7 @@
     </section>
 
     <section class="card grow-2" aria-label="New goal">
-      <h2>New goal</h2>
+      <h2>{{ editingId ? 'Edit goal' : 'New goal' }}</h2>
       <form class="form" [formGroup]="form" (ngSubmit)="add()" novalidate>
         <div class="field">
           <label for="name">Goal name</label>
@@ -49,7 +50,10 @@
         </div>
         <div class="field">
           <label for="saved">Already saved</label>
-          <input id="saved" class="input" type="number" formControlName="saved" placeholder="$ 0.00" />
+          <input id="saved" class="input" type="number" formControlName="saved" placeholder="$ 0.00" [class.invalid]="invalid('saved')" />
+          @if (invalid('saved')) {
+            <span class="error">Saved amount cannot be negative.</span>
+          }
         </div>
         <div class="field">
           <label for="deadline">Target date</label>
@@ -58,7 +62,10 @@
             <span class="error">Pick a target date.</span>
           }
         </div>
-        <button class="btn" type="submit">Save goal</button>
+        <button class="btn" type="submit">{{ editingId ? 'Update goal' : 'Save goal' }}</button>
+        @if (editingId) {
+          <button class="btn" type="button" (click)="cancelEdit()">Cancel</button>
+        }
       </form>
     </section>
   </div>

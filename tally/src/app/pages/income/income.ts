@@ -1,8 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Subscription } from 'rxjs';
+import { IncomeService } from '../../core/services/income.service';
+import { Income as IncomeModel } from '../../core/models/income.model';
 
 interface IncomeEntry {
-  id: number;
+  id: string;
   source: string;
   frequency: string;
   date: string;
@@ -14,27 +17,43 @@ interface IncomeEntry {
   standalone: false,
   templateUrl: './income.html',
 })
-export class Income {
-  frequencies = ['One-off', 'Weekly', 'Monthly'];
+export class Income implements OnInit, OnDestroy {
+  frequencies = ['One-off', 'Weekly', 'Monthly', 'Yearly'];
 
-  // TODO (Roles 3-5): replace with data from the income service / Firebase.
-  entries: IncomeEntry[] = [
-    { id: 1, source: 'Salary', frequency: 'Monthly', date: '2026-11-01', amount: 3500 },
-    { id: 2, source: 'Freelance', frequency: 'One-off', date: '2026-11-17', amount: 450 },
-    { id: 3, source: 'Tutoring', frequency: 'Weekly', date: '2026-11-15', amount: 125 },
-    { id: 4, source: 'Tutoring', frequency: 'Weekly', date: '2026-11-08', amount: 125 },
-  ];
-  private nextId = 5;
+  entries: IncomeEntry[] = [];
+  editingId: string | null = null;
+  private sub?: Subscription;
 
   form: FormGroup;
 
-  constructor(private fb: FormBuilder) {
+  constructor(
+    private fb: FormBuilder,
+    private incomeService: IncomeService,
+  ) {
     this.form = this.fb.group({
       source: ['', Validators.required],
       amount: [null, [Validators.required, Validators.min(0.01)]],
       frequency: ['One-off', Validators.required],
       date: ['', Validators.required],
     });
+  }
+
+  ngOnInit() {
+    this.sub = this.incomeService.incomes$.subscribe((list) => {
+      this.entries = list.map((i) => ({
+        id: i.id!,
+        source: i.source,
+        amount: i.amount,
+        date: i.date,
+        frequency: i.recurring && i.frequency
+          ? i.frequency.charAt(0).toUpperCase() + i.frequency.slice(1)
+          : 'One-off',
+      }));
+    });
+  }
+
+  ngOnDestroy() {
+    this.sub?.unsubscribe();
   }
 
   get total(): number {
@@ -59,20 +78,48 @@ export class Income {
     return !!control && control.touched && control.invalid;
   }
 
-  add() {
+  async add() {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
     const v = this.form.value;
-    this.entries = [
-      { id: this.nextId++, source: v.source, frequency: v.frequency, date: v.date, amount: Number(v.amount) },
-      ...this.entries,
-    ];
+    const recurring = v.frequency !== 'One-off';
+
+    const data: IncomeModel = {
+      source: v.source,
+      amount: Number(v.amount),
+      date: v.date,
+      recurring,
+      ...(recurring
+        ? { frequency: v.frequency.toLowerCase() as 'weekly' | 'monthly' | 'yearly' }
+        : {}),
+    };
+
+    if (this.editingId) {
+      await this.incomeService.update(this.editingId, data);
+    } else {
+      await this.incomeService.add(data);
+    }
+    this.cancelEdit();
+  }
+
+  edit(entry: IncomeEntry) {
+    this.editingId = entry.id;
+    this.form.patchValue({
+      source: entry.source,
+      amount: entry.amount,
+      frequency: entry.frequency,
+      date: entry.date,
+    });
+  }
+
+  cancelEdit() {
+    this.editingId = null;
     this.form.reset({ source: '', amount: null, frequency: 'One-off', date: '' });
   }
 
-  remove(entry: IncomeEntry) {
-    this.entries = this.entries.filter((e) => e.id !== entry.id);
+  async remove(entry: IncomeEntry) {
+    await this.incomeService.delete(entry.id);
   }
 }

@@ -41,7 +41,12 @@
                 <td>{{ e.frequency }}</td>
                 <td>{{ e.date | date: 'MMM d' }}</td>
                 <td class="right income"><strong>{{ e.amount | currency }}</strong></td>
-                <td><button type="button" class="link-btn danger" (click)="remove(e)">Delete</button></td>
+             <td>
+  <div style="display: flex; gap: 12px">
+    <button type="button" class="link-btn" (click)="edit(e)">Edit</button>
+    <button type="button" class="link-btn danger" (click)="remove(e)">Delete</button>
+  </div>
+</td>
               </tr>
             } @empty {
               <tr><td colspan="5" class="center">No income added yet.</td></tr>
@@ -52,7 +57,7 @@
     </section>
 
     <section class="card grow-2" aria-label="Add income">
-      <h2>Add income</h2>
+      <h2>{{ editingId ? 'Edit income' : 'Add income' }}</h2>
       <form class="form" [formGroup]="form" (ngSubmit)="add()" novalidate>
         <div class="field">
           <label for="source">Source</label>
@@ -83,7 +88,10 @@
             <span class="error">Pick a date.</span>
           }
         </div>
-        <button class="btn" type="submit">Save income</button>
+        <button class="btn" type="submit">{{ editingId ? 'Update income' : 'Save income' }}</button>
+        @if (editingId) {
+          <button class="btn" type="button" (click)="cancelEdit()">Cancel</button>
+        }
       </form>
     </section>
   </div>

@@ -17,7 +17,8 @@ import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { provideFirestore, getFirestore } from '@angular/fire/firestore';
 import { provideAuth, getAuth } from '@angular/fire/auth';
 import { provideHttpClient } from '@angular/common/http';
-import { environment } from '../environments/environment';  
+import { environment } from '../environments/environment';
+import { DaysLeftPipe } from './pipes/days-left-pipe';
 
 @NgModule({
   declarations: [
@@ -31,13 +32,9 @@ import { environment } from '../environments/environment';
     Income,
     Goals,
     Reports,
+    DaysLeftPipe,
   ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    FormsModule,
-    ReactiveFormsModule,
-  ],
+  imports: [BrowserModule, AppRoutingModule, FormsModule, ReactiveFormsModule],
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideHttpClient(),
@@ -47,4 +44,4 @@ import { environment } from '../environments/environment';
   ],
   bootstrap: [App],
 })
-export class AppModule { }
+export class AppModule {}
