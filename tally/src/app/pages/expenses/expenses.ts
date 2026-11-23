@@ -1,14 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-
-interface Expense {
-  id: number;
-  description: string;
-  category: string;
-  date: string;
-  amount: number;
-  recurring: boolean;
-}
+import { ExpenseService } from '../../core/services/expense.service'; 
+import { Expense } from '../../core/models/expense.model';
 
 @Component({
   selector: 'app-expenses',
@@ -16,44 +9,45 @@ interface Expense {
   templateUrl: './expenses.html',
 })
 export class Expenses {
-  categories = ['Food', 'Housing', 'Transport', 'Fun', 'Other'];
+  private fb = inject(FormBuilder);
+  public expenseService = inject(ExpenseService);
 
-  // TODO (Roles 3-5): replace with data from the expenses service / Firebase.
-  expenses: Expense[] = [
-    { id: 1, description: 'Grocery market', category: 'Food', date: '2026-11-19', amount: 62.4, recurring: false },
-    { id: 2, description: 'Metro card top-up', category: 'Transport', date: '2026-11-18', amount: 20, recurring: false },
-    { id: 3, description: 'Cinema tickets', category: 'Fun', date: '2026-11-15', amount: 24, recurring: false },
-    { id: 4, description: 'Rent', category: 'Housing', date: '2026-11-01', amount: 1100, recurring: true },
-    { id: 5, description: 'Phone plan', category: 'Other', date: '2026-11-03', amount: 35, recurring: true },
-    { id: 6, description: 'Weekly groceries', category: 'Food', date: '2026-11-12', amount: 78.1, recurring: false },
-    { id: 7, description: 'Taxi', category: 'Transport', date: '2026-11-10', amount: 14.5, recurring: false },
-  ];
-  private nextId = 8;
+  categories = ['Food', 'Housing', 'Transport', 'Fun', 'Other', 'Utilities', 'Health'];
+
+  expense$ = this.expenseService.expenses$;
+  
+  expenses: Expense[] = [];
 
   form: FormGroup;
   search = new FormControl('');
   filter = new FormControl('All');
 
-  constructor(private fb: FormBuilder) {
+  constructor() {
     this.form = this.fb.group({
-      description: ['', Validators.required],
+      title: ['', Validators.required],
       amount: [null, [Validators.required, Validators.min(0.01)]],
       category: ['Food', Validators.required],
-      date: ['', Validators.required],
+      date: [new Date().toISOString().slice(0, 10), Validators.required],
       recurring: [false],
+      frequency: ['monthly'],
+      notes: ['']
     });
-  }
+
+    this.expense$.subscribe(data => {
+      this.expenses = data;
+    });
+  } 
 
   get filtered(): Expense[] {
     const query = (this.search.value ?? '').toLowerCase();
     const category = this.filter.value ?? 'All';
     return this.expenses.filter(
-      (e) => (category === 'All' || e.category === category) && e.description.toLowerCase().includes(query),
+      (e) => (category === 'All' || e.category === category) && e.title.toLowerCase().includes(query),
     );
   }
 
   get total(): number {
-    return this.expenses.reduce((sum, e) => sum + e.amount, 0);
+    return this.expenses.reduce((sum, e) => sum + Number(e.amount), 0);
   }
 
   invalid(name: string): boolean {
@@ -66,15 +60,34 @@ export class Expenses {
       this.form.markAllAsTouched();
       return;
     }
+    
     const v = this.form.value;
-    this.expenses = [
-      { id: this.nextId++, description: v.description, category: v.category, date: v.date, amount: Number(v.amount), recurring: !!v.recurring },
-      ...this.expenses,
-    ];
-    this.form.reset({ description: '', amount: null, category: 'Food', date: '', recurring: false });
+    const newExpense: Expense = {
+      title: v.title,
+      category: v.category,
+      date: v.date,
+      amount: Number(v.amount),
+      recurring: !!v.recurring,
+      frequency: v.recurring ? v.frequency : undefined,
+      notes: v.notes
+    };
+
+    this.expenseService.add(newExpense).then(() => {
+      this.form.reset({ 
+        title: '', 
+        amount: null, 
+        category: 'Food', 
+        date: new Date().toISOString().slice(0, 10), 
+        recurring: false,
+        frequency: 'monthly',
+        notes: ''
+      });
+    });
   }
 
   remove(expense: Expense) {
-    this.expenses = this.expenses.filter((e) => e.id !== expense.id);
+    if (expense.id) {
+      this.expenseService.delete(expense.id);
+    }
   }
 }

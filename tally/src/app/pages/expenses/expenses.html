@@ -14,14 +14,17 @@
     <section class="card grow-2" aria-label="Add expense">
       <h2>Add expense</h2>
       <form class="form" [formGroup]="form" (ngSubmit)="add()" novalidate>
+        
+        <!-- Changed to title to match model -->
         <div class="field">
-          <label for="description">Description</label>
-          <input id="description" class="input" type="text" formControlName="description" placeholder="e.g. Grocery market"
-            [class.invalid]="invalid('description')" />
-          @if (invalid('description')) {
-            <span class="error">Description is required.</span>
+          <label for="title">Title</label>
+          <input id="title" class="input" type="text" formControlName="title" placeholder="e.g. Grocery market"
+            [class.invalid]="invalid('title')" />
+          @if (invalid('title')) {
+            <span class="error">Title is required.</span>
           }
         </div>
+
         <div class="field">
           <label for="amount">Amount</label>
           <input id="amount" class="input" type="number" formControlName="amount" placeholder="$ 0.00" [class.invalid]="invalid('amount')" />
@@ -29,6 +32,7 @@
             <span class="error">Enter an amount greater than 0.</span>
           }
         </div>
+
         <div class="field">
           <label for="category">Category</label>
           <select id="category" class="input" formControlName="category">
@@ -37,6 +41,7 @@
             }
           </select>
         </div>
+
         <div class="field">
           <label for="date">Date</label>
           <input id="date" class="input" type="date" formControlName="date" [class.invalid]="invalid('date')" />
@@ -44,7 +49,26 @@
             <span class="error">Pick a date.</span>
           }
         </div>
+
         <label class="check"><input type="checkbox" formControlName="recurring" /> This is a recurring expense</label>
+        
+        <!-- Show frequency if recurring is checked -->
+        @if (form.get('recurring')?.value === true) {
+          <div class="field" style="margin-top: 10px;">
+            <label for="frequency">Frequency</label>
+            <select id="frequency" class="input" formControlName="frequency">
+              <option value="weekly">Weekly</option>
+              <option value="monthly">Monthly</option>
+              <option value="yearly">Yearly</option>
+            </select>
+          </div>
+        }
+
+        <div class="field">
+          <label for="notes">Notes (Optional)</label>
+          <input id="notes" class="input" type="text" formControlName="notes" placeholder="Any extra details..." />
+        </div>
+
         <button class="btn" type="submit">Save expense</button>
       </form>
     </section>
@@ -67,35 +91,40 @@
       </div>
 
       <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th scope="col">Description</th>
-              <th scope="col">Category</th>
-              <th scope="col">Date</th>
-              <th scope="col" class="right">Amount</th>
-              <th scope="col">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (e of filtered; track e.id) {
+        <!-- Use the async pipe to wait for Firebase data -->
+        @if (expense$ | async) {
+          <table>
+            <thead>
               <tr>
-                <td>
-                  <strong>{{ e.description }}</strong>
-                  @if (e.recurring) {
-                    <span class="badge recurring">Recurring</span>
-                  }
-                </td>
-                <td>{{ e.category }}</td>
-                <td>{{ e.date | date: 'MMM d' }}</td>
-                <td class="right expense"><strong>{{ e.amount | currency }}</strong></td>
-                <td><button type="button" class="link-btn danger" (click)="remove(e)">Delete</button></td>
+                <th scope="col">Title</th> <!-- Changed from Description -->
+                <th scope="col">Category</th>
+                <th scope="col">Date</th>
+                <th scope="col" class="right">Amount</th>
+                <th scope="col">Actions</th>
               </tr>
-            } @empty {
-              <tr><td colspan="5" class="center">No expenses match your search.</td></tr>
-            }
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              @for (e of filtered; track e.id) {
+                <tr>
+                  <td>
+                    <strong>{{ e.title }}</strong> <!-- Changed from e.description -->
+                    @if (e.recurring) {
+                      <span class="badge recurring">Recurring</span>
+                    }
+                  </td>
+                  <td>{{ e.category }}</td>
+                  <td>{{ e.date | date: 'MMM d' }}</td>
+                  <td class="right expense"><strong>{{ e.amount | currency }}</strong></td>
+                  <td><button type="button" class="link-btn danger" (click)="remove(e)">Delete</button></td>
+                </tr>
+              } @empty {
+                <tr><td colspan="5" class="center">No expenses match your search.</td></tr>
+              }
+            </tbody>
+          </table>
+        } @else {
+          <p class="center">Loading expenses from database...</p>
+        }
       </div>
       <p class="hint">Showing {{ filtered.length }} of {{ expenses.length }} expenses</p>
     </section>
