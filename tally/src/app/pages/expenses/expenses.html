@@ -11,11 +11,11 @@
   </header>
 
   <div class="row">
+    
     <section class="card grow-2" aria-label="Add expense">
       <h2>Add expense</h2>
       <form class="form" [formGroup]="form" (ngSubmit)="add()" novalidate>
         
-        <!-- Changed to title to match model -->
         <div class="field">
           <label for="title">Title</label>
           <input id="title" class="input" type="text" formControlName="title" placeholder="e.g. Grocery market"
@@ -52,7 +52,7 @@
 
         <label class="check"><input type="checkbox" formControlName="recurring" /> This is a recurring expense</label>
         
-        <!-- Show frequency if recurring is checked -->
+       
         @if (form.get('recurring')?.value === true) {
           <div class="field" style="margin-top: 10px;">
             <label for="frequency">Frequency</label>
@@ -73,7 +73,10 @@
       </form>
     </section>
 
+
     <section class="card grow-5" aria-label="Expense list">
+      
+     
       <div class="row">
         <div class="field grow-2">
           <label for="search">Search</label>
@@ -91,12 +94,12 @@
       </div>
 
       <div class="table-wrap">
-        <!-- Use the async pipe to wait for Firebase data -->
-        @if (expense$ | async) {
+        
+        @if (expense$ | async; as expenseList) {
           <table>
             <thead>
               <tr>
-                <th scope="col">Title</th> <!-- Changed from Description -->
+                <th scope="col">Title</th>
                 <th scope="col">Category</th>
                 <th scope="col">Date</th>
                 <th scope="col" class="right">Amount</th>
@@ -107,9 +110,9 @@
               @for (e of filtered; track e.id) {
                 <tr>
                   <td>
-                    <strong>{{ e.title }}</strong> <!-- Changed from e.description -->
+                    <strong>{{ e.title }}</strong>
                     @if (e.recurring) {
-                      <span class="badge recurring">Recurring</span>
+                      <span class="badge recurring">Recurring ({{ e.frequency }})</span>
                     }
                   </td>
                   <td>{{ e.category }}</td>
@@ -126,6 +129,7 @@
           <p class="center">Loading expenses from database...</p>
         }
       </div>
+      
       <p class="hint">Showing {{ filtered.length }} of {{ expenses.length }} expenses</p>
     </section>
   </div>

@@ -1,6 +1,7 @@
 import { NgModule, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common'; 
 import { AppRoutingModule } from './app-routing-module';
 import { App } from './app';
 import { Shell } from './layout/shell/shell';
@@ -38,7 +39,14 @@ import Aura from '@primeuix/themes/aura';
     Reports,
     DaysLeftPipe,
   ],
-  imports: [BrowserModule, AppRoutingModule, FormsModule, ReactiveFormsModule, ChartModule],
+  imports: [
+    BrowserModule, 
+    AppRoutingModule, 
+    FormsModule, 
+    ReactiveFormsModule, 
+    ChartModule,
+    CommonModule 
+  ],
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideHttpClient(),

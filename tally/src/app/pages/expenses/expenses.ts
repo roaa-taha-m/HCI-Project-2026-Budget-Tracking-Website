@@ -14,7 +14,9 @@ export class Expenses {
 
   categories = ['Food', 'Housing', 'Transport', 'Fun', 'Other', 'Utilities', 'Health'];
 
+ 
   expense$ = this.expenseService.expenses$;
+  
   
   expenses: Expense[] = [];
 
@@ -36,7 +38,7 @@ export class Expenses {
     this.expense$.subscribe(data => {
       this.expenses = data;
     });
-  } 
+  }
 
   get filtered(): Expense[] {
     const query = (this.search.value ?? '').toLowerCase();
@@ -55,24 +57,35 @@ export class Expenses {
     return !!control && control.touched && control.invalid;
   }
 
-  add() {
+  async add() {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
     
     const v = this.form.value;
-    const newExpense: Expense = {
+    
+    
+    const newExpense: any = {
       title: v.title,
       category: v.category,
       date: v.date,
       amount: Number(v.amount),
       recurring: !!v.recurring,
-      frequency: v.recurring ? v.frequency : undefined,
-      notes: v.notes
+      notes: v.notes || '' 
     };
 
-    this.expenseService.add(newExpense).then(() => {
+   
+    if (v.recurring) {
+      newExpense.frequency = v.frequency;
+    }
+
+    try {
+      await this.expenseService.add(newExpense);
+      
+      console.log('Expense added successfully!');
+      
+     
       this.form.reset({ 
         title: '', 
         amount: null, 
@@ -82,7 +95,11 @@ export class Expenses {
         frequency: 'monthly',
         notes: ''
       });
-    });
+      
+    } catch (error) {
+      console.error('Error saving to Firebase:', error);
+      alert('Failed to save the expense. Please check the browser console (F12) for details.');
+    }
   }
 
   remove(expense: Expense) {
