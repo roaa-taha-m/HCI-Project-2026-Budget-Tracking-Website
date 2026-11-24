@@ -20,6 +20,10 @@ import { provideHttpClient } from '@angular/common/http';
 import { environment } from '../environments/environment';
 import { DaysLeftPipe } from './pipes/days-left-pipe';
 
+import { ChartModule } from 'primeng/chart';
+import { providePrimeNG } from 'primeng/config';
+import Aura from '@primeuix/themes/aura';
+
 @NgModule({
   declarations: [
     App,
@@ -34,13 +38,14 @@ import { DaysLeftPipe } from './pipes/days-left-pipe';
     Reports,
     DaysLeftPipe,
   ],
-  imports: [BrowserModule, AppRoutingModule, FormsModule, ReactiveFormsModule],
+  imports: [BrowserModule, AppRoutingModule, FormsModule, ReactiveFormsModule, ChartModule],
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideHttpClient(),
     provideFirebaseApp(() => initializeApp(environment.firebase)),
     provideFirestore(() => getFirestore()),
     provideAuth(() => getAuth()),
+    providePrimeNG({theme: {preset: Aura}})
   ],
   bootstrap: [App],
 })

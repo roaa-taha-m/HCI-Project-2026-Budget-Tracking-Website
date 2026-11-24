@@ -29,30 +29,29 @@
   @switch (reportType.value) {
     @case ('income-expenses') {
       <section class="card">
-        <div class="between">
-          <h2>Income vs expenses</h2>
-          <div class="legend">
-            <span><i style="background: var(--primary)"></i>Income</span>
-            <span><i style="background: #E58A57"></i>Expenses</span>
-          </div>
-        </div>
-        <div class="bars">
-          @for (m of months; track m.name) {
-            <div class="bar-group">
-              <div class="bar-pair">
-                <div class="bar inc" [style.height.px]="barHeight(m.income)" [title]="m.income | currency"></div>
-                <div class="bar exp" [style.height.px]="barHeight(m.expenses)" [title]="m.expenses | currency"></div>
-              </div>
-              <span class="bar-label">{{ m.name }}</span>
-            </div>
-          }
+        <h2>Income vs expenses</h2>
+
+        <div style="height: 320px;">
+          <p-chart
+            type="bar"
+            [data]="incomeExpensesData"
+            [options]="incomeExpensesOptions"
+          />
         </div>
       </section>
     }
 
     @case ('budget-variance') {
       <section class="card">
-        <h2>Budget variance · November 2026</h2>
+        <h2>Budget variance · {{ currentMonthLabel }}</h2>
+
+        <div style="height: 550px; margin-bottom: 24px;">
+          <p-chart
+            type="bar"
+            [data]="budgetVarianceData"
+            [options]="budgetVarianceOptions"
+          />
+        </div>
         <div class="table-wrap">
           <table>
             <thead>
@@ -96,17 +95,18 @@
       <section class="card">
         <div class="between">
           <h2>Savings progress</h2>
-          <strong class="income">{{ totalSavings | currency: 'USD' : 'symbol' : '1.0-0' }} saved in 6 months</strong>
+          <strong class="income">
+            {{ totalSavings | currency: 'USD' : 'symbol' : '1.0-0' }}
+            saved in 6 months
+          </strong>
         </div>
-        <div class="bars">
-          @for (s of savings; track s.name) {
-            <div class="bar-group">
-              <div class="bar-pair">
-                <div class="bar sav" [style.height.px]="barHeight(s.amount, 1500)" [title]="s.amount | currency"></div>
-              </div>
-              <span class="bar-label">{{ s.name }}</span>
-            </div>
-          }
+
+        <div style="height: 320px;">
+          <p-chart
+            type="line"
+            [data]="savingsData"
+            [options]="savingsOptions"
+          />
         </div>
       </section>
     }

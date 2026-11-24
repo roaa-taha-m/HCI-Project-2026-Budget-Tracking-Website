@@ -1,8 +1,8 @@
 <div class="page">
   <header class="page-head">
     <div>
-      <h1>Good morning, Alex</h1>
-      <p class="page-sub">Here is your money overview for November 2026.</p>
+      <h1>Good morning, {{ (user$ | async)?.displayName || 'there' }}</h1>
+      <p class="page-sub">Here is your money overview for {{ currentMonthLabel }}.</p>
     </div>
     <a class="btn" routerLink="/expenses">+ Add expense</a>
   </header>
@@ -61,7 +61,7 @@
     <div class="card grow-3">
       <div class="between"><h2>Recent transactions</h2><a routerLink="/expenses">See all</a></div>
       <ul class="list">
-        @for (t of transactions; track t.title) {
+        @for (t of transactions; track $index) {
           <li>
             <div><strong>{{ t.title }}</strong><br /><small>{{ t.category }} · {{ t.date | date: 'MMM d' }}</small></div>
             <strong [class.income]="t.amount > 0" [class.expense]="t.amount < 0">{{ t.amount | currency }}</strong>
