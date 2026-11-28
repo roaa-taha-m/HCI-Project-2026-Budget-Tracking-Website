@@ -1,59 +1,68 @@
-# Tally
+# Tally: Budget Tracking Website
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.2.5.
+Tally is a web app for tracking budgets, expenses, income and savings goals, with charts and reports. It was built as the HCI (Human Computer Interaction) course project, 2026.
 
-## Development server
+**Live site:** https://hci-budget-tracking.web.app
 
-To start a local development server, run:
+## Features
+
+- **Authentication:** register and log in with email and password. Pages are protected by a route guard.
+- **Dashboard:** summary cards and charts of your finances.
+- **Budgets:** create monthly budgets per category.
+- **Expenses:** add, edit and delete expenses, including recurring ones.
+- **Income:** track income sources.
+- **Goals:** set savings goals with progress and days left.
+- **Reports:** income vs expenses, budget variance and savings progress, with a date filter and print/PDF export.
+
+## Tech stack
+
+| Area | Technology |
+|---|---|
+| Framework | Angular 22 (NgModule-based) |
+| Forms | Angular Reactive Forms |
+| UI components and charts | PrimeNG, Chart.js |
+| Auth and database | Firebase Authentication, Cloud Firestore (via `@angular/fire`) |
+| Async data | RxJS |
+| Hosting | Firebase Hosting |
+| Prototype | Figma: [link] |
+
+## Project structure
+
+```
+src/app/
+  auth/          login and register pages
+  core/
+    guards/      route guard (auth.guard.ts)
+    models/      Expense, Income, Budget, Goal interfaces
+    services/    FirestoreService (generic CRUD), Auth, Expense, Income,
+                 Budget, Goal and Report services
+  layout/shell/  navigation layout
+  pages/         dashboard, budgets, expenses, income, goals, reports
+  pipes/         custom pipes (days left)
+src/environments/  Firebase configuration
+```
+
+All data is stored per user in Firestore under `users/{uid}/...`, and security rules allow users to read and write only their own data.
+
+## Run it locally
+
+Requirements: Node.js (LTS), Git and the Angular CLI (`npm i -g @angular/cli`).
 
 ```bash
+git clone https://github.com/roaa-taha-m/HCI-Project-2026-Budget-Tracking-Website.git
+cd HCI-Project-2026-Budget-Tracking-Website/tally
+npm install
 ng serve
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Open http://localhost:4200. The repo includes a `.npmrc` with `legacy-peer-deps=true`, because `@angular/fire` does not yet declare support for Angular 22.
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## Build and deploy
 
 ```bash
-ng generate component component-name
+ng build                          # output goes to dist/tally/browser
+firebase login                    # first time only
+firebase deploy --only hosting
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+The Firebase project is `hci-budget-tracking`. Deploying requires Owner or Editor access to that project.
