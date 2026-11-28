@@ -43,7 +43,7 @@
 
     @case ('budget-variance') {
       <section class="card">
-        <h2>Budget variance · {{ currentMonthLabel }}</h2>
+        <h2>Budget variance · {{ rangeLabel }}</h2>
 
         <div style="height: 550px; margin-bottom: 24px;">
           <p-chart
@@ -82,7 +82,11 @@
                 <td class="right"><strong>{{ totalBudgeted | currency: 'USD' : 'symbol' : '1.0-0' }}</strong></td>
                 <td class="right"><strong>{{ totalActual | currency: 'USD' : 'symbol' : '1.0-0' }}</strong></td>
                 <td class="right">
+                  @if (totalActual > totalBudgeted) {
+                    <strong class="expense">{{ totalActual - totalBudgeted | currency: 'USD' : 'symbol' : '1.0-0' }} over</strong>
+                  } @else {
                   <strong class="income">{{ totalBudgeted - totalActual | currency: 'USD' : 'symbol' : '1.0-0' }} under</strong>
+                  }
                 </td>
               </tr>
             </tbody>
@@ -97,7 +101,7 @@
           <h2>Savings progress</h2>
           <strong class="income">
             {{ totalSavings | currency: 'USD' : 'symbol' : '1.0-0' }}
-            saved in 6 months
+            saved in {{ months.length }} {{ months.length === 1 ? 'month' : 'months' }}
           </strong>
         </div>
 
